@@ -1,0 +1,7 @@
+Install the Requirements: pip install -r requirements.txt
+Then, make database migrations: python manage.py makemigrations
+python manage.py migrate
+And finally, run the application: python manage.py runserver
+NB: if system does not run, install gtk3-runtime-3.24.31-2022-01-04-ts-win64, we have attached in this folder.
+For Admin Login Credentials : python manage.py createsuperuser
+ 

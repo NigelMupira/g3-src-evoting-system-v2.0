@@ -1,0 +1,21 @@
+# Ignore database file
+db.sqlite3
+
+# Ignore Python cache files
+*.pyc
+__pycache__/
+
+# Ignore environment files (if you have secret keys)
+.env
+
+# Ignore Django migrations (optional, but can be helpful)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Ignore VSCode or IDE folders
+.vscode/
+.idea/
+
+# Ignore system files
+.DS_Store
+Thumbs.db

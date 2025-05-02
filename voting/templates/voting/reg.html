@@ -1,0 +1,284 @@
+{% extends "voting/base.html" %}
+{% block content %}
+
+<style>
+/* === Apply Sky Blue Background on the Whole Page with Animation === */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Ensure it covers the entire screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    background-color: #87CEEB; /* Sky Blue */
+    animation: skyBlueAnimation 10s ease infinite; /* Animation for background transition */
+}
+
+/* === Login Box Style === */
+.login-box {
+    background-color: #fff; /* White background for the form */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin-top: 0;
+}
+
+/* === Hover Effect - Slight Lift === */
+.login-box:hover {
+    transform: translateY(-5px); /* Lift the form by 5px */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow when hovered */
+}
+
+.login-logo {
+    background-color: #28a745; /* Green background color */
+    color: white; /* White text color */
+    font-size: 24px;
+    padding: 10px; /* Add some padding around the text */
+    border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+/* === GLOW EFFECTS (Blue for typing, Green for hover) === */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] { /* Added phone number field */
+    transition: box-shadow 0.3s, border 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus { /* Added focus style for phone number field */
+    border-color: #66afe9;  /* Blue border when typing */
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.8); /* Blue glow when typing */
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="tel"]:hover { /* Added hover style for phone number field */
+    border-color: #28a745;  /* Green border on hover */
+    box-shadow: 0 0 6px rgba(40, 167, 69, 0.5); /* Green glow on hover */
+}
+
+/* === Password Strength Bar === */
+#passwordStrength {
+    height: 10px;
+    width: 100%;
+    background-color: #e0e0e0;
+    margin-top: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#strengthBar {
+    height: 100%;
+    width: 0%;
+    background-color: red;
+    transition: width 0.5s, background-color 0.5s, box-shadow 0.5s;
+    border-radius: 5px;
+}
+
+/* === Error Message Fade-in === */
+.fade-in {
+    opacity: 0;
+    transition: opacity 0.4s ease-in;
+}
+
+.fade-in.show {
+    opacity: 1;
+}
+
+/* === Background Animation for Sky Blue Effect === */
+@keyframes skyBlueAnimation {
+    0% {
+        background-color: #87CEEB; /* Sky Blue */
+    }
+    50% {
+        background-color: #00BFFF; /* Deep Sky Blue */
+    }
+    100% {
+        background-color: #87CEEB; /* Sky Blue */
+    }
+}
+</style>
+
+<div class="login-box">
+    <div class="login-logo">
+        <b>Registration</b>
+    </div>
+
+    <div class="login-box-body">
+        <form action="{% url 'account_register' %}" method="POST" id="registerForm">
+            {% csrf_token %}
+            <div class="modal-body">
+                {% for field in form1 %}
+                <div class="form-group has-feedback">
+                    <span class="text-danger">{{ field.errors }}</span>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.name == "email" %}
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span> <!-- Email icon -->
+                    <small id="emailError" class="text-danger fade-in"></small> <!-- Email error message -->
+                    {% endif %}
+                    {% if field.name == "password" %}
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span> <!-- Password icon -->
+                    <div id="passwordStrength">
+                        <div id="strengthBar"></div>
+                    </div>
+                    <small id="passwordError" class="text-danger fade-in"></small>
+                    {% endif %}
+                    {% if field.name == "phone" %}
+                    <span class="glyphicon glyphicon-phone form-control-feedback"></span> <!-- Phone icon -->
+                    {% endif %}
+                    {% if field.name == "first_name" %}
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span> <!-- User icon for first name -->
+                    {% endif %}
+                    {% if field.name == "last_name" %}
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span> <!-- User icon for last name -->
+                    {% endif %}
+                    {% if field.name == "confirm_password" %}
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span> <!-- Lock icon for confirm password -->
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                {% for field in form2 %}
+                <div class="form-group has-feedback">
+                    <span class="text-danger">{{ field.errors }}</span>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.name == "phone" %}
+                    <span class="glyphicon glyphicon-phone form-control-feedback"></span> <!-- Phone icon -->
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat" name="login" id="registerBtn" disabled>
+                            <i class="fa fa-user-plus"></i> Register
+                        </button>
+                    </div>
+                    <div class="pull-right col-xs-6">
+                        <a class="btn btn-success btn-block btn-flat" href="{% url 'account_login' %}">
+                            <i class="fa fa-sign-in"></i> Log In
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// JavaScript for validation and strength bar
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const emailInput = document.querySelector('input[type="email"]');
+    const passwordInput = document.querySelector('input[type="password"]');
+    const registerBtn = document.getElementById('registerBtn');
+    const strengthBar = document.getElementById('strengthBar');
+    const passwordError = document.getElementById('passwordError');
+    const emailError = document.getElementById('emailError');
+
+    function validateEmail(email) {
+        const regex = /^[a-zA-Z][0-9]{6}[a-zA-Z]@hit\.ac\.zw$/;
+        return regex.test(email);
+    }
+
+    function checkPasswordCriteria(password) {
+        const lengthValid = password.length >= 8;
+        const lowerCase = /[a-z]/.test(password);
+        const upperCase = /[A-Z]/.test(password);
+        const number = /[0-9]/.test(password);
+        const specialChar = /[\W_]/.test(password);
+
+        return {
+            lengthValid,
+            lowerCase,
+            upperCase,
+            number,
+            specialChar,
+            isValid: lengthValid && lowerCase && upperCase && number && specialChar
+        };
+    }
+
+    function updateStrengthBar(password) {
+        let strength = 0;
+        const criteria = checkPasswordCriteria(password);
+        if (criteria.lengthValid) strength += 20;
+        if (criteria.lowerCase) strength += 20;
+        if (criteria.upperCase) strength += 20;
+        if (criteria.number) strength += 20;
+        if (criteria.specialChar) strength += 20;
+
+        strengthBar.style.width = strength + '%';
+        
+        if (strength < 40) {
+            strengthBar.style.backgroundColor = 'red';
+            strengthBar.style.boxShadow = 'none';
+        } else if (strength < 80) {
+            strengthBar.style.backgroundColor = 'orange';
+            strengthBar.style.boxShadow = 'none';
+        } else {
+            strengthBar.style.backgroundColor = 'green';
+            strengthBar.style.boxShadow = '0 0 10px lime';
+        }
+    }
+
+    function showPasswordError(password) {
+        const criteria = checkPasswordCriteria(password);
+        if (!criteria.isValid) {
+            passwordError.classList.add('show');
+            passwordError.innerHTML = 
+                `Password must contain:<br>
+                ${criteria.lengthValid ? '✅' : '❌'} At least 8 characters<br>
+                ${criteria.lowerCase ? '✅' : '❌'} At least one lowercase letter<br>
+                ${criteria.upperCase ? '✅' : '❌'} At least one uppercase letter<br>
+                ${criteria.number ? '✅' : '❌'} At least one number<br>
+                ${criteria.specialChar ? '✅' : '❌'} At least one special character`;
+        } else {
+            passwordError.classList.remove('show');
+            passwordError.innerHTML = '';
+        }
+    }
+
+    function showEmailError(email) {
+        if (email === "") {
+            emailError.classList.remove('show');
+            emailError.innerText = "";
+        } else if (!validateEmail(email)) {
+            emailError.classList.add('show');
+            emailError.innerText = "Please enter a valid hitmail";
+        } else {
+            emailError.classList.remove('show');
+            emailError.innerText = "";
+        }
+    }
+
+    function validateForm() {
+        const emailValid = validateEmail(emailInput.value);
+        const passwordCriteria = checkPasswordCriteria(passwordInput.value);
+
+        updateStrengthBar(passwordInput.value);
+        showPasswordError(passwordInput.value);
+        showEmailError(emailInput.value);
+
+        if (emailValid && passwordCriteria.isValid) {
+            registerBtn.disabled = false;
+        } else {
+            registerBtn.disabled = true;
+        }
+    }
+
+    emailInput.addEventListener('input', validateForm);
+    passwordInput.addEventListener('input', validateForm);
+});
+</script>
+
+{% endblock %}
